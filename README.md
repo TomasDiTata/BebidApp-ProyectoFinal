@@ -1,11 +1,5 @@
 # BebidApp - Sistema de Gestión y Venta de Bebidas
 
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
-![Thymeleaf](https://img.shields.io/badge/Thymeleaf-%23005F0F.svg?style=for-the-badge&logo=Thymeleaf&logoColor=white)
-![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white)
-
 ## Descripción
 BebidApp es una aplicación web Full Stack desarrollada como Proyecto Final. Simula un **E-commerce** completo para una distribuidora de bebidas, permitiendo la gestión de productos, usuarios y ventas.
 
