@@ -31,6 +31,4 @@ BebidApp es una aplicación web Full Stack desarrollada como Proyecto Final. Sim
 * **Backend:** Java 21, Spring Boot 3.2.0 (Security, JPA, MVC).
 * **Frontend:** Thymeleaf, HTML, CSS, Bootstrap, JavaScript.
 * **Base de Datos:** MySQL 8.0.
-* **Herramientas:** Maven, Lombok, NetBeans.
-# ProyectoFinal-BebidApp
-# ProyectoFinal-BebidApp
+* **Herramientas:** Maven, Lombok, NetBeans
