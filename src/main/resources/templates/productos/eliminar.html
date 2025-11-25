@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Eliminar Producto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body class="bg-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                
+                <div class="card border-danger shadow">
+                    <div class="card-header bg-danger text-white text-center py-3">
+                        <h3 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> ¿Eliminar Producto?</h3>
+                    </div>
+                    
+                    <div class="card-body text-center p-4">
+                        <p class="lead">Estás a punto de eliminar el siguiente producto del inventario:</p>
+                        
+                        <div class="alert alert-secondary d-inline-block px-5 py-3 mt-2">
+                            <h2 class="display-6 fw-bold text-dark" th:text="${producto.nombre}">Coca Cola</h2>
+                            <div class="text-muted" th:text="${producto.descripcion}">Descripción...</div>
+                            <hr>
+                            <div class="d-flex justify-content-between gap-4">
+                                <span>Categoría: <strong th:text="${producto.categoria}">Gaseosa</strong></span>
+                                <span>Stock: <strong th:text="${producto.stock}">50</strong></span>
+                            </div>
+                        </div>
+
+                        <p class="text-danger mt-4 fw-bold">
+                            ⚠️ Esta acción no se puede deshacer.
+                        </p>
+
+                        <div class="d-flex justify-content-center gap-3 mt-4">
+                            <a th:href="@{/productos/admin}" class="btn btn-outline-secondary btn-lg">
+                                Cancelar
+                            </a>
+
+                            <form th:action="@{/productos/admin/eliminar}" method="post">
+                                <input type="hidden" name="id" th:value="${producto.idProducto}">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-trash-fill"></i> Sí, Eliminar
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

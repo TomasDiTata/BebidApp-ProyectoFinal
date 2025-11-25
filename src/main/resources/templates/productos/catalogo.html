@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>BebidApp - Catálogo</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 sticky-top">
+    <div class="container-fluid px-4">
+        
+        <a class="navbar-brand fw-bold text-warning" th:href="@{/}">
+            🍺 BebidApp
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            
+            <form class="d-flex mx-auto my-3 my-lg-0" style="max-width: 500px; width: 100%;" 
+                  th:action="@{/productos/buscar}" method="get">
+                <div class="input-group">
+                    <input class="form-control" type="search" name="query" 
+                           placeholder="Buscar marca, categoría..." 
+                           th:value="${busqueda}" aria-label="Buscar">
+                    <button class="btn btn-warning" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                    <a th:if="${busqueda}" th:href="@{/}" class="btn btn-outline-light" title="Limpiar">
+                        ❌
+                    </a>
+                </div>
+            </form>
+
+            <div class="d-flex align-items-center justify-content-end gap-2 mt-3 mt-lg-0">
+                
+                <div sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/usuarios/login}" class="btn btn-outline-light btn-sm me-2">Ingresar</a>
+                    <a th:href="@{/usuarios/registro}" class="btn btn-warning btn-sm">Registrarse</a>
+                </div>
+
+                <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                    
+                    <a th:href="@{/carrito}" class="btn btn-warning btn-sm position-relative">
+                        🛒 <span class="d-none d-md-inline">Carrito</span>
+                    </a>
+                    
+                    <a th:href="@{/ventas/historial}" class="btn btn-outline-light btn-sm ms-1" title="Mis Compras">
+                        📋 Mis Compras
+                    </a>
+
+                    <div class="btn-group" sec:authorize="hasAnyRole('Administrador', 'Vendedor')">
+                        <a th:href="@{/productos/admin}" class="btn btn-primary btn-sm" title="Inventario">
+                            📦
+                        </a>
+                        <a th:href="@{/productos/admin/nuevo}" class="btn btn-success btn-sm" title="Producto nuevo">
+                            +
+                        </a>
+                    </div>
+
+                    <a sec:authorize="hasRole('Administrador')" 
+                       th:href="@{/usuarios/admin}" 
+                       class="btn btn-danger btn-sm"
+                       title="Usuarios">
+                       ⚙️
+                    </a>
+                    
+                    <span class="text-white fw-bold">
+                        Hola, <span sec:authentication="principal.nombre">Usuario</span>
+                    </span>
+                    
+                    <form th:action="@{/logout}" method="post" class="m-0">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm ms-1">Salir</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+    <div class="container">
+        <h1 class="text-center mb-4" th:text="${titulo}">Catálogo</h1>
+        
+        <!-- 🔽 FILTRO DE ORDEN 🔽 -->
+    <div class="d-flex justify-content-end mb-4">
+        <form method="get" id="ordenForm">
+            <select class="form-select w-auto" name="orden" onchange="ordenForm.submit()">
+                <option value="">Ordenar por...</option>
+                <option value="asc" th:selected="${param.orden == 'asc'}">Precio: Menor a Mayor</option>
+                <option value="desc" th:selected="${param.orden == 'desc'}">Precio: Mayor a Menor</option>
+            </select>
+        </form>
+    </div>
+
+    <script>
+    document.getElementById("ordenForm").addEventListener("change", function() {
+        const valor = this.orden.value;
+        if(valor) {
+            window.location.href = "/bebidapp/productos/ordenar/precio?orden=" + valor;
+        }
+    });
+    </script>
+    <!-- 🔼 FIN FILTRO 🔼 -->
+
+        <div th:if="${productos.empty}" class="alert alert-info text-center">
+            No hay bebidas disponibles en este momento.
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col" th:each="p : ${productos}">
+    <div class="card h-100 shadow-sm position-relative"> 
+        
+        
+        <div class="card-header bg-transparent border-0 p-0 text-center">
+            <img th:src="@{${p.imagenUrl}}" class="card-img-top" alt="Imagen de ${p.nombre}" style="max-height:200px; object-fit:cover;">
+        </div>
+
+        <div class="card-body">
+            <h5 class="card-title" th:text="${p.nombre}">Nombre</h5>
+            <p class="card-text text-muted" th:text="${p.descripcion}">Desc</p>
+            <span class="badge bg-secondary" th:text="${p.categoria}">Cat</span>
+        </div>
+
+        <div class="card-footer bg-transparent border-top-0 d-flex justify-content-between align-items-center">
+            <h4 class="text-primary mb-0">$<span th:text="${p.precioUnitario}">0.00</span></h4>
+
+            <a th:href="@{/productos/{id}(id=${p.idProducto})}" 
+               class="btn btn-primary stretched-link">
+                Ver más
+            </a>
+        </div>
+    </div>
+            </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

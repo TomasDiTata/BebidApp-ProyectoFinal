@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${titulo}">Formulario Producto</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body class="bg-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0" th:text="${titulo}">Producto</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        <form th:action="${editMode} ? @{/productos/admin/actualizar/{id}(id=${producto.idProducto})} : @{/productos/admin/guardar}"
+                              th:object="${producto}" method="post" novalidate>
+                            
+                            <input type="hidden" th:if="${editMode}" th:field="*{idProducto}"> <!-- SI NO FUNCIONA BORRAR -->
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nombre del Producto</label>
+                                <input type="text" class="form-control" th:field="*{nombre}" 
+                                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"
+                                       placeholder="Ej: Coca Cola 2.5L">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}">Error</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Descripción</label>
+                                <textarea class="form-control" th:field="*{descripcion}" rows="2"
+                                          th:classappend="${#fields.hasErrors('descripcion')} ? 'is-invalid' : ''"
+                                          placeholder="Breve detalle de la bebida..."></textarea>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}">Error</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Categoría</label>
+                                <select class="form-select" th:field="*{categoria}"
+                                        th:classappend="${#fields.hasErrors('categoria')} ? 'is-invalid' : ''">
+                                    <option value="Gaseosas" th:selected="${producto.categoria}=='Gaseosas'">Gaseosas</option>
+                                    <option value="Cervezas" th:selected="${producto.categoria}=='Cervezas'">Cervezas</option>
+                                    <option value="Vinos" th:selected="${producto.categoria}=='Vinos'">Vinos</option>
+                                    <option value="Aperitivos" th:selected="${producto.categoria}=='Aperitivos'">Aperitivos</option>
+                                    <option value="Agua" th:selected="${producto.categoria}=='Agua'">Agua</option>
+                                    <option value="Jugos" th:selected="${producto.categoria}=='Jugos'">Jugos</option>
+                                    <option value="Energizantes" th:selected="${producto.categoria}=='Energizantes'">Energizantes</option>
+                                    <option value="Vodkas" th:selected="${producto.categoria}=='Vodkas'">Vodkas</option>
+                                    <option value="Gins" th:selected="${producto.categoria}=='Gins'">Gins</option>
+                                    <option value="Whisky" th:selected="${producto.categoria}=='Whisky'">Whisky</option>
+                                </select>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}">Error</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">URL de la Imagen</label>
+                                    <input type="text" class="form-control" th:field="*{imagenUrl}"
+                                    th:classappend="${#fields.hasErrors('imagenUrl')} ? 'is-invalid' : ''"
+                                    placeholder="Ej: https://midominio.com/imagenes/coca-cola.jpg">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('imagenUrl')}" th:errors="*{imagenUrl}">Error</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Precio Unitario ($)</label>
+                                    <input type="number" step="0.01" class="form-control" th:field="*{precioUnitario}"
+                                           th:classappend="${#fields.hasErrors('precioUnitario')} ? 'is-invalid' : ''">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('precioUnitario')}" th:errors="*{precioUnitario}">Error</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Stock Inicial</label>
+                                    <input type="number" class="form-control" th:field="*{stock}"
+                                           th:classappend="${#fields.hasErrors('stock')} ? 'is-invalid' : ''">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}">Error</div>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-save"></i> Guardar Producto
+                                </button>
+                                <a th:href="@{/productos/admin}" class="btn btn-outline-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

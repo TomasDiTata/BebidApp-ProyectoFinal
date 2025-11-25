@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Finalizar Compra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/style.css}">
+</head>
+<body class="bg-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <h2 class="mb-4 text-center fw-bold">💳 Finalizar Compra</h2>
+                
+                <div th:if="${error}" class="alert alert-danger shadow-sm" th:text="${error}"></div>
+                
+                <div id="errorValidacion" class="alert alert-warning shadow-sm d-none">
+                    <i class="bi bi-exclamation-triangle-fill"></i> 
+                    <span id="mensajeErrorJS">Por favor revisa los datos de pago.</span>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Datos de Facturación</h6>
+                                <h5 class="card-title fw-bold" th:text="${usuario.nombre + ' ' + usuario.apellido}">Nombre</h5>
+                                <p class="mb-1"><i class="bi bi-person-vcard"></i> <span th:text="${usuario.dni}">123</span></p>
+                                <p class="mb-0"><i class="bi bi-envelope"></i> <span th:text="${usuario.email}">mail</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-md-0">
+                        <div class="card shadow-sm border-0 h-100 bg-dark text-white">
+                            <div class="card-body d-flex flex-column justify-content-center text-center">
+                                <h6 class="text-uppercase small fw-bold text-warning mb-2">Total a Pagar</h6>
+                                <h1 class="display-4 fw-bold mb-0" th:text="${'$ ' + total}">$0.00</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form th:action="@{/ventas/procesar}" method="post" id="formPago" novalidate>
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="mb-0 fw-bold">Selecciona tu método de pago</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
+                                <input type="radio" class="btn-check" name="metodoPago" id="efectivo" value="EFECTIVO" checked onclick="cambiarMetodo('efectivo')">
+                                <label class="btn btn-outline-success px-4" for="efectivo"><i class="bi bi-cash-coin"></i> Efectivo</label>
+
+                                <input type="radio" class="btn-check" name="metodoPago" id="debito" value="TARJETA_DEBITO" onclick="cambiarMetodo('tarjeta')">
+                                <label class="btn btn-outline-primary px-4" for="debito"><i class="bi bi-credit-card"></i> Débito</label>
+
+                                <input type="radio" class="btn-check" name="metodoPago" id="credito" value="TARJETA_CREDITO" onclick="cambiarMetodo('tarjeta')">
+                                <label class="btn btn-outline-primary px-4" for="credito"><i class="bi bi-credit-card-2-front"></i> Crédito</label>
+                                
+                                <input type="radio" class="btn-check" name="metodoPago" id="transferencia" value="TRANSFERENCIA" onclick="cambiarMetodo('transferencia')">
+                                <label class="btn btn-outline-secondary px-4" for="transferencia"><i class="bi bi-bank"></i> Transferencia</label>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div id="datosTarjeta" class="d-none fade-in">
+                                <h5 class="mb-3 text-primary"><i class="bi bi-shield-lock"></i> Datos de la Tarjeta</h5>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Número de Tarjeta</label>
+                                        <input type="text" class="form-control" id="cardNumero" placeholder="0000 0000 0000 0000" maxlength="19">
+                                        <div class="invalid-feedback">Debe tener 16 dígitos.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre del Titular</label>
+                                        <input type="text" class="form-control" id="cardNombre" placeholder="Como aparece en la tarjeta">
+                                        <div class="invalid-feedback">Nombre requerido.</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Vencimiento</label>
+                                        <input type="text" class="form-control" id="cardVto" placeholder="MM/AA" maxlength="5">
+                                        <div class="invalid-feedback">Fecha inválida o vencida.</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">CVV</label>
+                                        <input type="password" class="form-control" id="cardCvv" placeholder="123" maxlength="3">
+                                        <div class="invalid-feedback">3 dígitos.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="datosTransferencia" class="d-none fade-in">
+                                <div class="alert alert-info border-0">
+                                    <h6 class="fw-bold">Datos para transferir:</h6>
+                                    <p class="mb-0">CBU: <strong>000000310004488229911</strong></p>
+                                    <p class="mb-0">Alias: <strong>BEBIDA.APP.PAGO</strong></p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Número de Comprobante / Alias Origen</label>
+                                    <input type="text" class="form-control" id="transfComprobante" placeholder="Ej: 12345678">
+                                    <div class="invalid-feedback">Ingresa el comprobante.</div>
+                                </div>
+                            </div>
+
+                            <div id="mensajeEfectivo" class="fade-in">
+                                <div class="alert alert-success border-0">
+                                    <strong>Pago en Local:</strong> Abonarás al retirar tu pedido.
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="card-footer bg-white p-4 d-flex justify-content-between align-items-center">
+                            <a th:href="@{/carrito}" class="text-decoration-none text-secondary fw-bold">← Volver</a>
+                            <button type="button" onclick="validarYEnviar()" class="btn btn-success btn-lg px-5 shadow-sm fw-bold">
+                                Confirmar Compra ✅
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let metodoActual = 'efectivo';
+
+        function cambiarMetodo(metodo) {
+            metodoActual = metodo;
+            // Ocultar todos
+            document.getElementById('datosTarjeta').classList.add('d-none');
+            document.getElementById('datosTransferencia').classList.add('d-none');
+            document.getElementById('mensajeEfectivo').classList.add('d-none');
+            document.getElementById('errorValidacion').classList.add('d-none');
+
+            // Mostrar seleccionado
+            if (metodo === 'tarjeta') {
+                document.getElementById('datosTarjeta').classList.remove('d-none');
+            } else if (metodo === 'transferencia') {
+                document.getElementById('datosTransferencia').classList.remove('d-none');
+            } else {
+                document.getElementById('mensajeEfectivo').classList.remove('d-none');
+            }
+        }
+
+        function validarYEnviar() {
+            let valido = true;
+            let mensaje = "";
+
+            // Limpiar errores visuales previos
+            document.querySelectorAll('.form-control').forEach(i => i.classList.remove('is-invalid'));
+
+            if (metodoActual === 'tarjeta') {
+                // 1. Validar Número (16 dígitos, permite espacios)
+                let num = document.getElementById('cardNumero');
+                let numLimpio = num.value.replace(/\s/g, '');
+                if (!/^\d{16}$/.test(numLimpio)) {
+                    num.classList.add('is-invalid');
+                    valido = false;
+                }
+
+                // 2. Validar Nombre
+                let nom = document.getElementById('cardNombre');
+                if (nom.value.trim().length < 3) {
+                    nom.classList.add('is-invalid');
+                    valido = false;
+                }
+
+                // 3. Validar CVV (3 dígitos)
+                let cvv = document.getElementById('cardCvv');
+                if (!/^\d{3}$/.test(cvv.value)) {
+                    cvv.classList.add('is-invalid');
+                    valido = false;
+                }
+
+                // 4. Validar Vencimiento (MM/AA y Fecha Futura)
+                let vto = document.getElementById('cardVto');
+                if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(vto.value)) {
+                    vto.classList.add('is-invalid');
+                    valido = false;
+                } else {
+                    // Lógica de fecha (Año 20xx)
+                    let partes = vto.value.split('/');
+                    let mes = parseInt(partes[0]);
+                    let anio = parseInt("20" + partes[1]);
+                    let ahora = new Date();
+                    let anioActual = ahora.getFullYear();
+                    let mesActual = ahora.getMonth() + 1;
+
+                    if (anio < anioActual || (anio === anioActual && mes < mesActual)) {
+                        vto.classList.add('is-invalid'); // Vencida
+                        valido = false;
+                        mensaje = "La tarjeta está vencida.";
+                    }
+                }
+
+            } else if (metodoActual === 'transferencia') {
+                // Validar Comprobante
+                let comp = document.getElementById('transfComprobante');
+                if (comp.value.trim().length < 4) {
+                    comp.classList.add('is-invalid');
+                    valido = false;
+                }
+            }
+
+            // RESULTADO FINAL
+            if (valido) {
+                // Si todo está bien, enviamos el formulario al servidor
+                document.getElementById('formPago').submit();
+            } else {
+                // Si hay errores, mostramos alerta y NO enviamos
+                let boxError = document.getElementById('errorValidacion');
+                document.getElementById('mensajeErrorJS').innerText = mensaje || "Por favor completa correctamente los campos en rojo.";
+                boxError.classList.remove('d-none');
+                // Scroll arriba para que vea el error
+                window.scrollTo(0, 0);
+            }
+        }
+    </script>
+
+    <style>
+        .fade-in { animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+
+</body>
+</html>
